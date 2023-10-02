@@ -22,12 +22,12 @@ function processFolder(input) {
 		if(File.isDirectory(input + File.separator + list[i]))
 			processFolder(input + File.separator + list[i]);
 		if(endsWith(list[i], suffix))
-			processFile(input, output1, output2, list[i],i);
+			processFile(input, output1, output2, list[i]);
 	}
 }
 
 
-function processFile(input, output1, output2,file,i) {
+function processFile(input, output1, output2,file) {
 	// Do the processing here by adding your own code.
 	// Leave the print statements until things work, then remove them.
 	open(input + File.separator + file);
@@ -38,12 +38,10 @@ function processFile(input, output1, output2,file,i) {
 	saveAs("Tiff",output1+File.separator+filename+"-2.tif");
 	wait(1000);
 	//if this is the first image we are processing, we need to open Weka and load the classifier
-	if (i==0) {
-		run("Trainable Weka Segmentation");
-		wait(3000);
-		call("trainableSegmentation.Weka_Segmentation.loadClassifier", "/Users/Stephanie/Library/CloudStorage/OneDrive-TheUniversityofColoradoDenver/From Dropbox/STED/STED Data/230802/Classification/Glutamate_Image14_Traindata_classifier.model");
-		wait(10000);
-	}
+	run("Trainable Weka Segmentation");
+	wait(3000);
+	call("trainableSegmentation.Weka_Segmentation.loadClassifier", "/Users/Stephanie/Library/CloudStorage/OneDrive-TheUniversityofColoradoDenver/From Dropbox/STED/STED Data/230802/Classification/Glutamate_Image14_Traindata_classifier.model");
+	wait(10000);
 	call("trainableSegmentation.Weka_Segmentation.applyClassifier", output1,filename+"-2.tif", "showResults=true", "storeResults=false", "probabilityMaps=false", "");
 	wait(30000);
 	selectImage("Classification result");
@@ -58,4 +56,6 @@ function processFile(input, output1, output2,file,i) {
 	selectImage("Result of "+filename+"-2.tif");
 	print("Saving masked mitos image to : " + output1);
 	saveAs("Tiff", output1 + File.separator + filename +"_segmented.tif");
+	close("*");
+	
 }
