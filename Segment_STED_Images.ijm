@@ -36,15 +36,18 @@ function processFile(input, output1, output2,file,i) {
 	// If threedim=true, Open file, separate stack to images and save middle image to mitos folder
 	// If threedim=false, just open the file
 	filename = file.substring(0, file.lastIndexOf("."));
+	print("Pre-processing stacks: " + filename);
 	if (threedim==true){
 		open(input + File.separator + file);
 		run("Stack to Images");
 		selectImage(filename+"-0002");
+		wait(100);
 		saveAs("Tiff",output1+File.separator+filename+".tif");
-		close();
-	}
+		wait(100);
+		close(filename+"*");
+		}
 
-	wait(500);
+	wait(100);
 	//If first iteration, open Weka and load classifier
 	if (i==0){
 		waitForUser("Select the new single plane image if z-stacks, or your first image if not, to open with Weka");
@@ -56,21 +59,26 @@ function processFile(input, output1, output2,file,i) {
 	//if input folder contained z stacks, apply classifier to single plane tiff image saved
 	//if input folder contained single plane images, apply classifier to input image
 	if (threedim==true){
-		call("trainableSegmentation.Weka_Segmentation.applyClassifier", output1,filename+".tif", "showResults=true", "storeResults=false", "probabilityMaps=false", "");
-		print("Processing: " + output1 + File.separator + filename);
+		call("trainableSegmentation.Weka_Segmentation.applyClassifier", output1, filename+".tif", "showResults=true", "storeResults=false", "probabilityMaps=false", "");
+		print("Classifying: " + output1 + File.separator + filename);
 	}
 	else{
 		call("trainableSegmentation.Weka_Segmentation.applyClassifier", input,filename+".tif", "showResults=true", "storeResults=false", "probabilityMaps=false", "");
-		print("Processing: " + input + File.separator + filename);
+		print("Classifying: " + input + File.separator + filename);
 	}
+	
+
 	//test if done classifying image
 	while(!isOpen("Classification result")){
 		wait(5000);
 	}
+	wait(3000);
 	//Fix mask so mitos are at high value, then save
 	selectImage("Classification result");
 	//Flip mask so Mitos are high and background is low
+	wait(300);
 	run("Calculator Plus", "i1=[Classification result] i2=[Classification result] operation=[Multiply: i2 = (i1*i2) x k1 + k2] k1=-1 k2=1 create");
+	wait(300);
 	selectImage("Classification result");
 	close();
 	selectImage("Result");
@@ -80,17 +88,19 @@ function processFile(input, output1, output2,file,i) {
 	run("Options...", "iterations=1 count=1 black pad do=Nothing");
 	print("Saving mask to: " + output2);
 	saveAs("Tiff", output2 + File.separator + filename + "_mask.tif" );
-	
+	print("Mask saved for: " + filename);
+	wait(200);
 	//mulitply image by mask, convert to 16bit and then save
 	imageCalculator("Multiply create 32-bit", filename+".tif", filename + "_mask.tif");
 	selectImage("Result of "+filename+".tif");
 	setOption("ScaleConversions", true);
 	run("16-bit");
 	print("Saving masked mitos image to : " + output1);
+	wait(200);
 	saveAs("Tiff", output1 + File.separator + filename +"_segmented.tif");
-	close();
-	selectImage(filename + "_mask.tif");
-	close();
-	selectImage(filename + ".tif");
-	close();
+	wait(200);
+	print("segmented mitos saved for: " + filename);
+	close(filename+"*");
+	print("Done with processing" + filename);
 }
+close("*");
