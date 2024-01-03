@@ -12,7 +12,7 @@ close("*");
 #@ File (label = "Input Folder", style = "directory") input
 #@ File (label = "Out Mitos Folder", style = "directory") output1
 #@ File (label = "Out Mask Folder", style = "directory") output2
-#@ File (label = "Classifier .model file", style = "file") classifier
+#@ File (label = "Classifier.model file", style = "file") classifier
 #@ String (label = "File suffix", value = ".tif") suffix
 #@ boolean (label = "z-stacks?", value =false) threedim
 
@@ -36,7 +36,7 @@ function processFile(input, output1, output2,file,i) {
 	// If threedim=true, Open file, separate stack to images and save middle image to mitos folder
 	// If threedim=false, just open the file
 	filename = file.substring(0, file.lastIndexOf("."));
-	print("Pre-processing stacks: " + filename);
+	print("Pre-processing stack: " + filename);
 	if (threedim==true){
 		open(input + File.separator + file);
 		run("Stack to Images");
@@ -55,6 +55,7 @@ function processFile(input, output1, output2,file,i) {
 		wait(3000);
 		call("trainableSegmentation.Weka_Segmentation.loadClassifier", classifier);
 		wait(10000);
+		print("Classifier loaded");
 	}
 	//if input folder contained z stacks, apply classifier to single plane tiff image saved
 	//if input folder contained single plane images, apply classifier to input image
@@ -72,13 +73,15 @@ function processFile(input, output1, output2,file,i) {
 	while(!isOpen("Classification result")){
 		wait(5000);
 	}
-	wait(3000);
+	wait(5000);
 	//Fix mask so mitos are at high value, then save
+	//waitForUser("Done with Classification");
 	selectImage("Classification result");
 	//Flip mask so Mitos are high and background is low
-	wait(300);
+	wait(500);
 	run("Calculator Plus", "i1=[Classification result] i2=[Classification result] operation=[Multiply: i2 = (i1*i2) x k1 + k2] k1=-1 k2=1 create");
-	wait(300);
+	wait(500);
+	//waitForUser("Done with Calculation Mitos high BG low.  Are Classification result and Result both open?");
 	selectImage("Classification result");
 	close();
 	selectImage("Result");
@@ -89,6 +92,7 @@ function processFile(input, output1, output2,file,i) {
 	print("Saving mask to: " + output2);
 	saveAs("Tiff", output2 + File.separator + filename + "_mask.tif" );
 	print("Mask saved for: " + filename);
+	//waitForUser("Done with saving mask.  filename and mask images open?");
 	wait(200);
 	//mulitply image by mask, convert to 16bit and then save
 	imageCalculator("Multiply create 32-bit", filename+".tif", filename + "_mask.tif");
@@ -100,6 +104,7 @@ function processFile(input, output1, output2,file,i) {
 	saveAs("Tiff", output1 + File.separator + filename +"_segmented.tif");
 	wait(200);
 	print("segmented mitos saved for: " + filename);
+	//waitForUser("Done with saving masked mitos image, check files all saved?");
 	close(filename+"*");
 	print("Done with processing" + filename);
 }
