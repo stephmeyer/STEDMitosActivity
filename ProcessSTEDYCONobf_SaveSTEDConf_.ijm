@@ -1,9 +1,12 @@
 
 /*
- * Macro to process multiple Mitos images in a folder
- * Input folder contains segmented STED images
- * Output folder will be where final data is saved
- * 
+ * Macro to take a list of mitos STED images from a stable or decon folder set, open the .obf files from the STEDYCON
+ * then save their corresponding Confocal and raw STED images into folders
+ * Stable or Decon Folder contains images that we want the matching STED and/or Conf images for
+ * Obf files Folder is where the STEDYCON .obf files are saved
+ * Conf 3D Folder is where the 3D confocal images will be saved
+ * STED 3D Folder is where the 3D STED images will be saved
+ * F
  */
 //create folders for your output mitos images and masks, but not inside the folder where the images you need to process live
 close("*");
@@ -12,7 +15,8 @@ close("*");
 #@ File (label = "Conf 3D Folder", style = "directory") output1
 #@ File (label = "STED 3D Folder", style = "directory") output2
 #@ String (label = "File suffix", value = "_STED_stable.tif") suffix
-
+//4AP_3_hours_STED_stable.tif
+// 4AP 3 hours.obf
 processFolder(input1); 
 // function to scan folders/subfolders/files to find files with correct suffix, then run processFile on each tif file
 function processFolder(input1) {
@@ -48,7 +52,7 @@ function processFolder(input1) {
 function processFile(input2, output1, output2, suffix, filename, results) {
 	close("*");
 	
-	open(input2 + File.separator + filename + ".obf");
+	open(input2 + File.separator + filename +  ".obf");
 	wait(100);
 	if(results[0] == true) {
 		selectImage(filename + ".obf - ATTO 647N.Confocal");
