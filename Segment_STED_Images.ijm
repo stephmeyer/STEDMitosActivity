@@ -14,7 +14,7 @@ close("*");
 #@ File (label = "Out Mask Folder", style = "directory") output2
 #@ File (label = "Classifier.model file", style = "file") classifier
 #@ String (label = "File suffix", value = ".tif") suffix
-#@ boolean (label = "z-stacks?", value =false) threedim
+#@ boolean (label = "z-stacks?", value =true) threedim
 
 
 processFolder(input);
@@ -50,7 +50,7 @@ function processFile(input, output1, output2,file,i) {
 	wait(100);
 	//If first iteration, open Weka and load classifier
 	if (i==0){
-		waitForUser("Select the new single plane image if z-stacks, or your first image if not, to open with Weka");
+		waitForUser("Open and select the new single plane image in mitos foldeer if z-stacks, or your first image if not, to open with Weka");
 		run("Trainable Weka Segmentation");
 		wait(3000);
 		call("trainableSegmentation.Weka_Segmentation.loadClassifier", classifier);
