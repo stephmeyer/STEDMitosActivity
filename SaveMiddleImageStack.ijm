@@ -26,7 +26,6 @@ function processFolder(input) {
 
 function processFile(input, output, file) {
 	close("*");
-	open(input + File.separator + file);
 	filename = file.substring(0, file.lastIndexOf("."));
 	open(input + File.separator + file);
 	run("Stack to Images");
@@ -37,5 +36,3 @@ function processFile(input, output, file) {
 	close(filename+"*");
 	}
 
-
-}
