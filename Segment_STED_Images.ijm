@@ -44,13 +44,13 @@ function processFile(input, output1, output2,file,i) {
 		wait(100);
 		saveAs("Tiff",output1+File.separator+filename+".tif");
 		wait(100);
-		close(filename+"*");
+		if (i!=0) {close(filename+"*");}
 		}
 
 	wait(100);
 	//If first iteration, open Weka and load classifier
 	if (i==0){
-		waitForUser("Open and select the new single plane image in mitos foldeer if z-stacks, or your first image if not, to open with Weka");
+		waitForUser("Select or open any mitos image to open Weka");
 		run("Trainable Weka Segmentation");
 		wait(3000);
 		call("trainableSegmentation.Weka_Segmentation.loadClassifier", classifier);
